@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 namespace UITKit.Components;
@@ -31,6 +32,7 @@ public class UITSlider : VisualElement
     private bool m_suppressEvents;
     private float m_lastCommittedValue;
     private float m_step; // 0 = ホイール無効
+    private float m_notchSize;
 
     public float Value => m_slider != null ? m_slider.value : 0f;
 
@@ -53,20 +55,23 @@ public class UITSlider : VisualElement
         style.flexShrink = 1;
         style.minWidth = 0;
 
-        // 名前ラベル: 固定幅。NameLabelWidth を超える文字は WhiteSpace.Normal で折り返し、
-        // 長いラベル (例: "BlendShape フェード半径 (m)") は 2 行以上に伸びる。
-        // 親 row 側は height ではなく minHeight 指定で行を可変高さにしておく必要がある。
-        m_nameLabel = new Label(label);
-        m_nameLabel.style.color = kNameLabelColor;
-        m_nameLabel.style.fontSize = 10;
-        m_nameLabel.style.width = NameLabelWidth;
-        m_nameLabel.style.minWidth = NameLabelWidth;
-        m_nameLabel.style.maxWidth = NameLabelWidth;
-        m_nameLabel.style.flexGrow = 0;
-        m_nameLabel.style.flexShrink = 0;
-        m_nameLabel.style.whiteSpace = WhiteSpace.Normal;
-        if (font != null) m_nameLabel.style.unityFont = font;
-        Add(m_nameLabel);
+        if (label != null)
+        {
+            // 名前ラベル: 固定幅。NameLabelWidth を超える文字は WhiteSpace.Normal で折り返し、
+            // 長いラベル (例: "BlendShape フェード半径 (m)") は 2 行以上に伸びる。
+            // 親 row 側は height ではなく minHeight 指定で行を可変高さにしておく必要がある。
+            m_nameLabel = new Label(label);
+            m_nameLabel.style.color = kNameLabelColor;
+            m_nameLabel.style.fontSize = 10;
+            m_nameLabel.style.width = NameLabelWidth;
+            m_nameLabel.style.minWidth = NameLabelWidth;
+            m_nameLabel.style.maxWidth = NameLabelWidth;
+            m_nameLabel.style.flexGrow = 0;
+            m_nameLabel.style.flexShrink = 0;
+            m_nameLabel.style.whiteSpace = WhiteSpace.Normal;
+            if (font != null) m_nameLabel.style.unityFont = font;
+            Add(m_nameLabel);
+        }
 
         m_slider = new Slider(min, max)
         {
@@ -90,6 +95,12 @@ public class UITSlider : VisualElement
         });
         m_slider.RegisterValueChangedCallback(evt =>
         {
+            if (Keyboard.current?.shiftKey.isPressed != true)
+            {
+                evt.newValue = SnapToNotch(evt.newValue);
+                m_slider.SetValueWithoutNotify(evt.newValue);
+            }
+
             UpdateValueText(evt.newValue);
             UpdateFillWidth();
             if (m_suppressEvents) return;
@@ -125,6 +136,9 @@ public class UITSlider : VisualElement
         Add(m_valueLabel);
         FitValueLabelFontSize();
     }
+
+    public void Setup(float min, float max, Font font = null, Func<float, string> formatter = null)
+        => Setup(null, min, max, font, formatter);
 
     /// <summary>値ラベルの最小・最大フォントサイズ。kValueFontMax を起点にスケール、kValueFontMin で頭打ち。</summary>
     private const float kValueFontMin = 7f;
@@ -194,6 +208,12 @@ public class UITSlider : VisualElement
         finally { m_suppressEvents = false; }
     }
 
+    public void SetValueAndNotify(float v)
+    {
+        if (m_slider == null) return;
+        m_slider.value = Mathf.Clamp(v, m_slider.lowValue, m_slider.highValue);
+    }
+
     /// <summary>highValue を変更する。現在値が範囲外になれば clamp する。</summary>
     public void SetRange(float min, float max)
     {
@@ -242,6 +262,19 @@ public class UITSlider : VisualElement
         m_lastCommittedValue = m_slider.value;
         OnValueCommitted?.Invoke(m_slider.value);
         evt.StopPropagation();
+    }
+
+    public void SetNotchSize(float notchSize)
+    {
+        m_notchSize = !(notchSize > 0f) ? 0f : notchSize;
+        m_slider.pageSize = m_notchSize;
+    }
+
+    private float SnapToNotch(float value)
+    {
+        return m_notchSize <= 0
+            ? value
+            : Mathf.Round(value / m_notchSize) * m_notchSize;
     }
 
     /// <summary>

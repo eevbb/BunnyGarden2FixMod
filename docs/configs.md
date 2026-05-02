@@ -194,4 +194,6 @@ Wardrobe パネル表示中、以下のキーで操作できます。
 | `FastForwardButton` | `None` | 早送りホールドのボタン<br>押している間のみ有効。倍率は FastForwardSpeed で設定。 |
 | `ShowKey` | `F7` | 衣装変更 UI 表示のキーボードキー |
 | `ShowButton` | `None` | 衣装変更 UI 表示のボタン |
+| `SkirtWindShowKey` | `F10` | スカート風力 UI 表示のキーボードキー |
+| `SkirtWindShowButton` | `None` | スカート風力 UI 表示のボタン |
 

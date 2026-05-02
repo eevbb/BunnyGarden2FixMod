@@ -127,6 +127,8 @@ public static class Configs
     public static global::BunnyGarden2FixMod.Utils.HotkeyConfig FastForward;
     /// <summary>衣装変更 UI 表示</summary>
     public static global::BunnyGarden2FixMod.Utils.HotkeyConfig CostumeChangerShow;
+    /// <summary>スカート風力 UI 表示</summary>
+    public static global::BunnyGarden2FixMod.Utils.HotkeyConfig SkirtWindShow;
 
     // ─── BindAll: Plugin.Awake から1回呼ぶ ──────────
     public static void BindAll(ConfigFile cfg)
@@ -500,6 +502,13 @@ FastForward ホットキー押下中の Time.timeScale 倍率。",
             global::UnityEngine.InputSystem.Key.F7,
             global::BunnyGarden2FixMod.Utils.ControllerButton.None,
             @"衣装変更 UI 表示",
+            @"");
+
+        SkirtWindShow = new global::BunnyGarden2FixMod.Utils.HotkeyConfig(cfg,
+            "Hotkey", "SkirtWindShow",
+            global::UnityEngine.InputSystem.Key.F10,
+            global::BunnyGarden2FixMod.Utils.ControllerButton.None,
+            @"スカート風力 UI 表示",
             @"");
 
     }
@@ -975,6 +984,15 @@ FastForward ホットキー押下中の Time.timeScale 倍率。",
             Desc     = "",
             Kind            = global::BunnyGarden2FixMod.Patches.Settings.UIKind.KeyBinding,
             HotkeyProvider  = () => CostumeChangerShow,
+            DropdownOptions = global::System.Enum.GetNames(typeof(global::BunnyGarden2FixMod.Utils.ControllerButton)),
+        },
+        new global::BunnyGarden2FixMod.Patches.Settings.UIEntryMeta
+        {
+            Category = "Hotkey",
+            Label    = "スカート風力 UI 表示",
+            Desc     = "",
+            Kind            = global::BunnyGarden2FixMod.Patches.Settings.UIKind.KeyBinding,
+            HotkeyProvider  = () => SkirtWindShow,
             DropdownOptions = global::System.Enum.GetNames(typeof(global::BunnyGarden2FixMod.Utils.ControllerButton)),
         },
     };

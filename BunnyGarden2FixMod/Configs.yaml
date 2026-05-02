@@ -693,3 +693,11 @@
       defaultButton: None
       ui:
         kind: keybinding
+
+    - name: SkirtWindShow
+      label: スカート風力 UI 表示
+      type: hotkey
+      defaultKey: F10
+      defaultButton: None
+      ui:
+        kind: keybinding

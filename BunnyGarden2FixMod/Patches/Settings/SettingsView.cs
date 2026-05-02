@@ -552,6 +552,7 @@ public class SettingsView : MonoBehaviour
             // SetValue は m_suppressEvents により OnValueChanged を発火させない安全な初期値設定
             sl.SetValue(entry.Accessor.GetFloat());
             sl.SetStep(entry.SliderStep);
+            sl.SetNotchSize(entry.SliderStep);
             sl.OnValueChanged += v => entry.Accessor.SetFloat(v);
             row.Add(sl);
             return new RowHandle { Entry = entry, Row = row, Slider = sl };
